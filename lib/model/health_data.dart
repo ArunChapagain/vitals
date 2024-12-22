@@ -1,14 +1,23 @@
+import 'package:hive/hive.dart';
+part 'health_data.g.dart';
+
+@HiveType(typeId: 0)
 class HealthData {
-  final int heartRate;
-  final int steps;
+  @HiveField(0)
   final DateTime timestamp;
-  
+
+  @HiveField(1)
+  final int heartRate;
+
+  @HiveField(2)
+  final int steps;
+
   HealthData({
     required this.heartRate,
     required this.steps,
     required this.timestamp,
   });
-  
+
   Map<String, dynamic> toMap() {
     return {
       'heartRate': heartRate,
@@ -16,7 +25,7 @@ class HealthData {
       'timestamp': timestamp.toIso8601String(),
     };
   }
-  
+
   factory HealthData.fromMap(Map<String, dynamic> map) {
     return HealthData(
       heartRate: map['heartRate'],
