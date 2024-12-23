@@ -1,6 +1,4 @@
-# Project Title
-
-A Flutter application with Firebase as the backend.
+# Vitals
 
 ## Project Setup
 
