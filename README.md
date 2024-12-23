@@ -1,16 +1,62 @@
-# vitals
+# Project Title
 
-A new Flutter project.
+A Flutter application with Firebase as the backend.
 
-## Getting Started
+## Project Setup
 
-This project is a starting point for a Flutter application.
+1. **Clone the repository:**
+    ```sh
+    git clone https://github.com/your-repo/flutter-firebase-app.git
+    cd flutter-firebase-app
+    ```
 
-A few resources to get you started if this is your first Flutter project:
+2. **Install dependencies:**
+    ```sh
+    flutter pub get
+    ```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+3. **Set up Firebase using FlutterFire CLI:**
+    - Install the FlutterFire CLI:
+      ```sh
+      dart pub global activate flutterfire_cli
+      ```
+    - Configure Firebase for your Flutter app:
+      ```sh
+      flutterfire configure
+      ```
+    - Follow the prompts to select your Firebase project and platforms (Android/iOS). The CLI will automatically download and configure the `google-services.json` and `GoogleService-Info.plist` files for you.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+4. **Configure Firebase in your Flutter app:**
+    - Add the Firebase dependencies to your `pubspec.yaml` file:
+      ```yaml
+      dependencies:
+         firebase_core: latest_version
+         firebase_auth: latest_version
+         cloud_firestore: latest_version
+      ```
+    - Initialize Firebase in your `main.dart` file:
+      ```dart
+      import 'package:firebase_core/firebase_core.dart';
+
+      void main() async {
+         WidgetsFlutterBinding.ensureInitialized();
+         await Firebase.initializeApp();
+         runApp(MyApp());
+      }
+      ```
+
+## Running the App
+
+1. **Run the app on an emulator or physical device:**
+    ```sh
+    flutter run
+    ```
+
+## Design Decisions
+
+- **Flutter:** Chosen for its cross-platform capabilities, allowing the app to run on both Android and iOS with a single codebase.
+- **Firebase:** Selected as the backend for its real-time database, authentication, and hosting services, which streamline the development process.
+- **State Management:** Utilized Provider for state management due to its simplicity and integration with Flutter's widget tree.
+- **Architecture:** Followed the MVC (Model-View-Controller) pattern to separate business logic from UI, making the codebase more maintainable and testable.
+
+
