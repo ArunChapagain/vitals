@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:vitals/main.dart';
 import 'package:vitals/provider/provider_application.dart';
 import 'package:vitals/provider/provider_auth.dart';
+import 'package:vitals/provider/provider_health_data.dart';
 import 'package:vitals/view/auth/auth_page.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -187,6 +188,8 @@ class SettingsScreen extends StatelessWidget {
               Navigator.pop(context);
               await Provider.of<ProviderAuth>(context, listen: false).signOut();
               if (context.mounted) {
+                Provider.of<ProviderHealthData>(context, listen: false)
+                    .dispose();
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const AuthPage()),
                   (route) => false,
@@ -200,4 +203,3 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 }
-

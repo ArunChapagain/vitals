@@ -12,7 +12,7 @@ class MockBluetoothSDK {
   Stream<int> getHeartRateStream() async* {
     while (true) {
       await Future.delayed(const Duration(
-          milliseconds: 800)); // Update heart rate at 800 millisecond
+          milliseconds: 500)); // Update heart rate at 800 millisecond
 
       // Randomly adjust base heart rate occasionally
       if (_random.nextInt(60) == 0) {
@@ -36,10 +36,10 @@ class MockBluetoothSDK {
 
     while (true) {
       await Future.delayed(
-          const Duration(seconds: 2)); // Update steps every 2 seconds
+          const Duration(seconds: 3)); // Update steps every 3 seconds
 
-      // Generate random steps (0-5 steps per 2-second interval)
-      int newSteps = _random.nextInt(6);
+      // Generate random steps (0-4 steps per 3-second interval)
+      int newSteps = _random.nextInt(2) + 1;
       totalSteps += newSteps;
 
       yield totalSteps;

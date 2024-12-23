@@ -56,11 +56,7 @@ class DashboardScreen extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const SettingsScreen()),
-        ).then((value) {
-          if (value != null) {
-            Provider.of<ProviderHealthData>(context, listen: false).dispose();
-          }
-        });
+        );
       },
     );
   }

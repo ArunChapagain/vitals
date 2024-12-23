@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:vitals/provider/provider_health_data.dart';
 import 'package:vitals/view/connection/screen_watch_connection.dart';
 
 class ProviderApplication extends ChangeNotifier {
@@ -28,13 +30,15 @@ class ProviderApplication extends ChangeNotifier {
 
   void disconnectWatch(BuildContext context) {
     _isWatchConnected = false;
-     if (!_isWatchConnected) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) => const WatchConnectionScreen(),
-        ),
-        (route) => false,
-      );
+    if (!_isWatchConnected) {
+      Navigator.of(context)
+          .pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => const WatchConnectionScreen(),
+            ),
+            (route) => false,
+          )
+          .then((value) => context.read<ProviderHealthData>().dispose());
     }
     notifyListeners();
   }
@@ -44,7 +48,5 @@ class ProviderApplication extends ChangeNotifier {
     notifyListeners();
   }
 
-  void monitorWatchConnection(BuildContext context) {
-   
-  }
+  void monitorWatchConnection(BuildContext context) {}
 }
