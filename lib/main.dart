@@ -1,11 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:vitals/provider/provider_application.dart';
 import 'package:vitals/provider/provider_auth.dart';
 import 'package:vitals/provider/provider_health_data.dart';
 import 'package:vitals/provider/provider_history.dart';
 import 'package:vitals/provider/provider_network_checker.dart';
-import 'package:vitals/view/connection/screen_watch_connection.dart';
+import 'package:vitals/view/auth/auth_page.dart';
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,14 +17,20 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ProviderAuth()),
-        ChangeNotifierProvider(create: (_) => ProviderNetworkChecker(),
-        lazy: false,
+        ChangeNotifierProvider(create: (_) => ProviderApplication()),
+        ChangeNotifierProvider(
+          create: (_) => ProviderNetworkChecker(),
+          lazy: false,
         ),
-        ChangeNotifierProxyProvider<ProviderNetworkChecker,ProviderHealthData>(create: (_) => ProviderHealthData(true),
-        update: (_, networkChecker, healthData) => ProviderHealthData(networkChecker.isConnected),
+        ChangeNotifierProxyProvider2<ProviderNetworkChecker,ProviderApplication, ProviderHealthData>(
+          create: (_) => ProviderHealthData(true,Duration(minutes: 5)),
+          update: (_, networkChecker, application, healthData) =>
+              ProviderHealthData(networkChecker.isConnected, application.syncInterval),
         ),
-        ChangeNotifierProxyProvider<ProviderNetworkChecker,ProviderHistory>(create: (_) => ProviderHistory(true),
-        update: (_, networkChecker, history) => ProviderHistory(networkChecker.isConnected),
+        ChangeNotifierProxyProvider<ProviderNetworkChecker, ProviderHistory>(
+          create: (_) => ProviderHistory(true),
+          update: (_, networkChecker, history) =>
+              ProviderHistory(networkChecker.isConnected),
         ),
       ],
       child: const HealthMonitorApp(),
@@ -36,13 +44,15 @@ class HealthMonitorApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'Health Monitor',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home:const  WatchConnectionScreen(), // home:
+      home: const AuthPage(), 
+      initialRoute: '/',
     );
   }
 }

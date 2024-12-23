@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:vitals/provider/provider_application.dart';
 import 'package:vitals/provider/provider_health_data.dart';
 import 'package:vitals/view/dashboard/screen_dashboard.dart';
 
@@ -112,14 +113,14 @@ class _WatchConnectionScreenState extends State<WatchConnectionScreen> with Sing
                               _controller.repeat();
                               
                               final success = await context
-                                  .read<ProviderHealthData>()
+                                  .read<ProviderApplication>()
                                   .connectToWatch();
                               
                               if (success && mounted) {
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) =>  DashboardScreen(),
+                                    builder: (_) =>  const DashboardScreen(),
                                   ),
                                 );
                               }

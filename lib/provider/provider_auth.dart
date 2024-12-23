@@ -9,30 +9,98 @@ class ProviderAuth with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  User? get currentUser => _auth.currentUser;
+    Future<UserCredential?> signInWithGoogle() async {
+         try {
 
-  Future<UserCredential?> signInWithGoogle() async {
-    try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return null;
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn(); //begin interactive sign in process
+
 
       final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
+          await googleUser!.authentication; //obtain the auth details from the request
+
+
+      final credential = GoogleAuthProvider.credential(  //create a new credential
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      return await _auth.signInWithCredential(credential);
+      //sign in to firebase with the credential
+      return await FirebaseAuth.instance.signInWithCredential(credential);
     } catch (e) {
-      print('Error signing in with Google: $e');
+      throw Exception(e);
+    }
+  }
+
+  Future<String?> signInWithEmail(String email, String password) async {
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       return null;
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'user-not-found':
+          return 'Invalid Email';
+        case 'wrong-password':
+          return 'Invalid Password';
+        case 'invalid-email':
+          return 'Invalid Email';
+        case 'invalid-credential':
+          return 'User not found';
+        default:
+          return 'An error occurred';
+      }
+    }
+  }
+
+  Future<String?> registerWithEmail(
+      String email, String password, String confirmPassword) async {
+    try {
+      if (password != confirmPassword) {
+        return 'Passwords do not match';
+      }
+      await _auth.createUserWithEmailAndPassword(  //create a new user with email and password
+        email: email,
+        password: password,
+      );
+      return null;
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'weak-password':
+          return 'Password is too weak';
+        case 'email-already-in-use':
+          return 'Email already exists';
+        case 'invalid-email':
+          return 'Invalid email';
+        default:
+          return 'Registration failed';
+      }
+    }
+  }
+
+  String getErrorMessage(String code) {
+    switch (code) {
+      case 'Invalid Email':
+        return 'Please enter a valid email';
+      case 'User not found':
+        return 'Sign up to create an account';
+      case 'Invalid Password':
+        return 'Invalid Password';
+      case 'Passwords do not match':
+        return 'Please make sure your passwords match';
+      default:
+        return 'An error occurred';
     }
   }
 
   Future<void> signOut() async {
-    await _googleSignIn.signOut();
-    await _auth.signOut();
-    notifyListeners();
+   try {
+      await _googleSignIn.signOut();
+      await _auth.signOut();
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Sign out error: $e');
+    }
   }
 }
