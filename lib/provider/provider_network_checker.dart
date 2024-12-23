@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 class ProviderNetworkChecker extends ChangeNotifier {
-  InternetStatus _status = InternetStatus.disconnected;
+  bool get isConnected => _status == InternetStatus.connected;
+  InternetStatus _status = InternetStatus.connected;
 
   ProviderNetworkChecker() {
     listenNetwork();
@@ -14,6 +15,4 @@ class ProviderNetworkChecker extends ChangeNotifier {
       notifyListeners();
     });
   }
-
-  InternetStatus get status => _status;
 }

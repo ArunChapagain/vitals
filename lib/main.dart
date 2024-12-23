@@ -1,4 +1,3 @@
-// lib/main.dart
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,9 +15,15 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ProviderAuth()),
-        ChangeNotifierProvider(create: (_) => ProviderHealthData()),
-        ChangeNotifierProvider(create: (_) => ProviderHistory()),
-        ChangeNotifierProvider(create: (_) => ProviderNetworkChecker()),
+        ChangeNotifierProvider(create: (_) => ProviderNetworkChecker(),
+        lazy: false,
+        ),
+        ChangeNotifierProxyProvider<ProviderNetworkChecker,ProviderHealthData>(create: (_) => ProviderHealthData(true),
+        update: (_, networkChecker, healthData) => ProviderHealthData(networkChecker.isConnected),
+        ),
+        ChangeNotifierProxyProvider<ProviderNetworkChecker,ProviderHistory>(create: (_) => ProviderHistory(true),
+        update: (_, networkChecker, history) => ProviderHistory(networkChecker.isConnected),
+        ),
       ],
       child: const HealthMonitorApp(),
     ),

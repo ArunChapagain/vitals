@@ -4,11 +4,14 @@ import 'package:vitals/model/health_data.dart';
 import 'package:vitals/service/service_local_database.dart';
 
 class ProviderHistory with ChangeNotifier {
+  ProviderHistory(bool isConnected) {
+    _isConnected = isConnected;
+  }
   final LocalDatabaseService _databaseService = LocalDatabaseService();
   final _firestore = FirebaseFirestore.instance;
-  bool _isConnected = false;
+  bool _isConnected = true;
 
-  // Get connection status from network provider 
+  // Get connection status from network provider
   void setConnectionStatus(bool isConnected) {
     _isConnected = isConnected;
     notifyListeners();
@@ -16,28 +19,41 @@ class ProviderHistory with ChangeNotifier {
 
   Future<List<HealthData>> getHealthHistory() async {
     try {
-      // First try to get local data
+      // Get local data first
       List<HealthData> localData = await _databaseService.getData();
-      
+
       if (_isConnected) {
-        // If online, try to sync with Firebase
         try {
-          final firebaseData = await _firestore.collection('health_data').get().then((snapshot) {
-            return snapshot.docs.map((doc) => HealthData.fromMap(doc.data())).toList();
-          });
-          // Merge and sort data
-          localData.addAll(firebaseData);
-          localData.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+          // Fetch from Firebase with proper query
+          final QuerySnapshot snapshot = await _firestore
+              .collection('health_records')
+              .orderBy('timestamp', descending: true)
+              .limit(100)
+              .get();
+
+          if (snapshot.docs.isNotEmpty) {
+            final firebaseData = snapshot.docs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              return HealthData(
+                timestamp: DateTime.parse(data['timestamp']),
+                heartRate: data['heartRate'],
+                steps: data['steps'],
+              );
+            }).toList();
+
+            // Merge and sort data
+            localData.addAll(firebaseData);
+            localData.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+          }
         } catch (e) {
-          debugPrint('Firebase sync failed: $e');
-          // Continue with local data if Firebase fails
+          debugPrint('Firebase fetch error: $e');
         }
       }
-      
+
       return localData;
     } catch (e) {
-      throw Exception('Failed to load health history: $e');
+      debugPrint('History fetch error: $e');
+      throw Exception('Failed to load health history');
     }
   }
-
 }

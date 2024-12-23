@@ -3,8 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:vitals/provider/provider_auth.dart';
 import 'package:vitals/provider/provider_health_data.dart';
 
-
-
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
@@ -12,7 +10,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final healthService = context.watch<ProviderHealthData>();
     final authService = context.read<ProviderAuth>();
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -30,12 +28,14 @@ class SettingsScreen extends StatelessWidget {
                   leading: const Icon(Icons.bluetooth),
                   title: const Text('Smartwatch Connection'),
                   subtitle: Text(
-                    healthService.isConnected ? 'Connected' : 'Disconnected',
+                    healthService.isWatchConnected
+                        ? 'Connected'
+                        : 'Disconnected',
                   ),
                   trailing: Switch(
-                    value: healthService.isConnected,
+                    value: healthService.isWatchConnected,
                     onChanged: (value) {
-                      healthService.setConnectionStatus(value);
+                      healthService.setConnectionStatus = value;
                     },
                   ),
                 ),
@@ -69,23 +69,13 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ),
                 const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.dark_mode),
-                  title: const Text('Dark Mode'),
-                  trailing: Switch(
-                    value: false,
-                    onChanged: (value) {
-                      // Toggle theme
-                    },
-                  ),
-                ),
               ],
             ),
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: const Color.fromARGB(255, 84, 129, 196),
               padding: const EdgeInsets.all(16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
